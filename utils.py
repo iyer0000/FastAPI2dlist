@@ -1,7 +1,10 @@
 import datetime
-from concurrent.futures import ProcessPoolExecutor
+
 import logging
 import sys 
+from concurrent.futures import ProcessPoolExecutor
+import os 
+
 def return_empty(ele_list:list):
     try:
         if len(ele_list)== 0:
@@ -22,8 +25,15 @@ def get_sum_elements(ele_list:list):
 
 def get_current_date():
     return datetime.datetime.now()
-
-def execute_process(input_list):
+    
+def validate_output_list(input_list):
+    temp=set(input_list)
+    if 'empty' in temp and len(temp)==1:
+        return True
+    else:
+        return False
+    
+def exec_process(input_list):
     output_list = []
     if len(input_list)-1<1:
         workers_count=1
@@ -33,23 +43,25 @@ def execute_process(input_list):
         output_list.extend(pool.map(get_sum_elements, input_list))
     if len(output_list)>0:
         return output_list
-    
-def validate_output_list(input_list):
-    temp=set(input_list)
-    if 'empty' in temp and len(temp)==1:
+
+def create_directory(dir_name:str):
+    if os.path.isdir(dir_name):
         return True
     else:
-        return False
-    
-def setup_custom_logger(name):
+        os.mkdir(dir_name)
+
+def setup_custom_logger():
     formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
                                   datefmt='%Y-%m-%d %H:%M:%S')
-    handler = logging.FileHandler(r'logs\log.txt', mode='a')
+    create_directory(r'logs')
+    handler = logging.FileHandler(r'logs\logs.txt', mode='a')
     handler.setFormatter(formatter)
     screen_handler = logging.StreamHandler(stream=sys.stdout)
     screen_handler.setFormatter(formatter)
-    logger = logging.getLogger(name)
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-    logger.addHandler(screen_handler)
+    if not logger.handlers:
+        logger.addHandler(handler)
+        logger.addHandler(screen_handler)
+        logger.propagate = False
     return logger
