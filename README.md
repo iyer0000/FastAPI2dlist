@@ -1,9 +1,13 @@
 # FastAPI2dlist
 pip install -r requirements.txt
 
-# To start the application
+# To start the application as in dev environment
+uvicorn main:app --reload
+# To start the application as non-dev
 uvicorn main:app --host 0.0.0.0 --port 80
 
+# To test the app (starting endpoint)
+http://127.0.0.1/
 # To test the docs part of the parameters
 http://127.0.0.1/docs#
 
